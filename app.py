@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import io
@@ -8,21 +7,25 @@ st.title("Estrazione Taglie da Excel")
 uploaded_file = st.file_uploader("Carica il file Excel", type=["xlsx"])
 if uploaded_file:
     df = pd.read_excel(uploaded_file, header=None)
-    st.dataframe(df, height=600)
+    st.subheader("Anteprima tabella grezza (riferimenti visivi)")
+    df_display = df.copy()
+    df_display.index = [f"Riga {i}" for i in df.index]
+    df_display.columns = [f"Col {i}" for i in df.columns]
+    st.dataframe(df_display, height=500)
 
-    st.subheader("Impostazioni")
+    st.subheader("Impostazioni di estrazione")
 
-    row_taglie = st.number_input("Numero di riga con le taglie (intestazione)", min_value=1, value=2)
-    sku_col = st.number_input("Numero colonna SKU (es. colonna 'Colore modello')", min_value=0, value=3)
-    start_col = st.number_input("Colonna iniziale del range taglie (es. colonna E = 4)", min_value=0, value=4)
-    end_col = st.number_input("Colonna finale del range taglie (es. colonna AE = 30)", min_value=1, value=30)
-    start_row = st.number_input("Riga iniziale del blocco dati", min_value=1, value=3)
-    end_row = st.number_input("Riga finale del blocco dati", min_value=1, value=19)
+    row_taglie = st.number_input("Numero di riga con le taglie (es. 2)", min_value=1, value=2)
+    sku_col = st.number_input("Numero colonna SKU (es. 3 per 'Colore modello')", min_value=0, value=3)
+    start_col = st.number_input("Colonna iniziale del range taglie (es. 4 per colonna E)", min_value=0, value=4)
+    end_col = st.number_input("Colonna finale del range taglie (es. 30 per colonna AE)", min_value=1, value=30)
+    start_row = st.number_input("Riga iniziale del blocco dati (es. 3)", min_value=1, value=3)
+    end_row = st.number_input("Riga finale del blocco dati (es. 19)", min_value=1, value=19)
 
     include_extra = st.checkbox("Includi una colonna extra (es. prezzo)?")
     col_extra_1 = None
     if include_extra:
-        col_extra_1 = st.number_input("Numero colonna extra da includere", min_value=0, value=0)
+        col_extra_1 = st.number_input("Numero colonna extra da includere (es. 58)", min_value=0, value=0)
 
     if st.button("Estrai dati"):
         size_labels = df.iloc[row_taglie - 1, start_col:end_col + 1].values
@@ -45,6 +48,7 @@ if uploaded_file:
                     output_rows.append(data_row)
 
         result_df = pd.DataFrame(output_rows)
+        st.success(f"Totale righe estratte: {len(result_df)}")
         st.dataframe(result_df)
 
         @st.cache_data
