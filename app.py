@@ -7,7 +7,7 @@ st.title("Estrazione Taglie da Excel")
 uploaded_file = st.file_uploader("Carica il file Excel", type=["xlsx"])
 if uploaded_file:
     df = pd.read_excel(uploaded_file, header=None)
-    
+
     # Mostra anteprima con intestazioni leggibili
     st.subheader("Anteprima tabella grezza (riferimenti visivi)")
     df_display = df.copy()
@@ -18,26 +18,26 @@ if uploaded_file:
     st.subheader("Impostazioni di estrazione")
 
     row_taglie = st.number_input(
-        "Numero di riga con le taglie (⚠️ inserisci 2 se le vedi su 'Riga 1' sopra)",
-        min_value=1, value=2
+        "Numero esatto della riga con le taglie (es. 'Riga 1' → scrivi 1)",
+        min_value=0, value=1
     )
     sku_col = st.number_input("Numero colonna SKU (es. 3 per 'Colore modello')", min_value=0, value=3)
     start_col = st.number_input("Colonna iniziale del range taglie (es. 4 per colonna E)", min_value=0, value=4)
     end_col = st.number_input("Colonna finale del range taglie (es. 30 per colonna AE)", min_value=1, value=30)
-    start_row = st.number_input("Riga iniziale del blocco dati (⚠️ inserisci 3 se i dati partono da 'Riga 2')", min_value=1, value=3)
-    end_row = st.number_input("Riga finale del blocco dati (es. 19)", min_value=1, value=19)
+    start_row = st.number_input("Riga iniziale del blocco dati (es. 'Riga 2' → scrivi 2)", min_value=0, value=2)
+    end_row = st.number_input("Riga finale del blocco dati", min_value=0, value=19)
 
     include_extra = st.checkbox("Includi una colonna extra (es. prezzo)?")
     col_extra_1 = None
     if include_extra:
-        col_extra_1 = st.number_input("Numero colonna extra da includere (es. 58)", min_value=0, value=0)
+        col_extra_1 = st.number_input("Numero colonna extra da includere", min_value=0, value=0)
 
     if st.button("Estrai dati"):
         try:
-            size_labels = df.iloc[row_taglie - 1, start_col:end_col + 1].values
+            size_labels = df.iloc[row_taglie, start_col:end_col + 1].values
             output_rows = []
 
-            for i in range(start_row - 1, end_row):
+            for i in range(start_row, end_row + 1):
                 row = df.iloc[i]
                 sku = row[sku_col]
                 extra_value = row[col_extra_1] if include_extra else None
