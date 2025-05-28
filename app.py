@@ -7,7 +7,7 @@ st.title("Estrazione Righe per Taglia da Excel")
 uploaded_file = st.file_uploader("Carica il file Excel", type=["xlsx"])
 if uploaded_file:
     df = pd.read_excel(uploaded_file, header=None)
-    st.write("Anteprima del file:", df.head(10))
+    st.dataframe(df, height=600)
 
     row_taglie = st.number_input("Numero di riga con le taglie (intestazione)", min_value=1, value=2)
     sku_col = st.number_input("Numero colonna SKU (es. 'Colore modello')", min_value=0, value=3)
